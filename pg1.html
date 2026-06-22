@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memories For Cello</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* BASE STYLES */
+        body {
+            background-color: #faf6f0;
+            font-family: 'Poppins', sans-serif;
+            color: #5c0618;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        #main-audio {
+            display: none;
+        }
+
+        /* POPUP TOMBOL MULAI (ROMANTIS & PREMIUM) */
+        #audio-gate {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #faf6f0;
+            z-index: 100000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 0 30px;
+            box-sizing: border-box;
+        }
+        .gate-title {
+            font-family: 'Caveat', cursive;
+            font-size: 2.8rem;
+            color: #a71d31;
+            margin-bottom: 10px;
+            text-align: center;
+            line-height: 1.2;
+        }
+        .gate-subtitle {
+            font-size: 1rem;
+            color: #615154;
+            max-width: 450px;
+            text-align: center;
+            margin: 0 0 35px 0;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+        .start-btn {
+            padding: 15px 40px;
+            background-color: #a71d31;
+            color: #faf6f0;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.05rem;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(167, 29, 49, 0.3);
+            transition: all 0.3s ease;
+        }
+        .start-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            background-color: #c71f37;
+            box-shadow: 0 8px 20px rgba(167, 29, 49, 0.45);
+        }
+
+        h1 {
+            font-family: 'Caveat', cursive;
+            font-size: 3.5rem;
+            margin-bottom: 5px;
+            color: #a71d31;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            margin-top: 50px;
+            margin-bottom: 30px;
+            border-bottom: 2px dashed #a71d31;
+            padding-bottom: 5px;
+            font-weight: 600;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .memory-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 40px;
+            max-width: 1200px;
+            margin-top: 20px;
+        }
+
+        /* POLAROID STANDAR */
+        .polaroid {
+            background: #ffffff;
+            padding: 15px 15px 25px 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+            border-radius: 2px;
+            width: 260px;
+            position: relative;
+            transform: rotate(var(--angle));
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .polaroid img {
+            display: block;
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border: 1px solid #f0f0f0;
+        }
+
+        /* POLAROID SESUAI RASIO FOTO */
+        .custom-ratio-container {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 50px;
+            margin-top: 20px;
+        }
+
+        .polaroid-auto-ratio {
+            background: #ffffff;
+            padding: 12px 12px 24px 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+            border-radius: 2px;
+            display: inline-block;
+            width: fit-content;
+            max-width: 350px;
+            position: relative;
+            transform: rotate(var(--angle));
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .polaroid-auto-ratio img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            object-fit: contain;
+            border: 1px solid #f0f0f0;
+        }
+
+        .polaroid:hover, .polaroid-auto-ratio:hover {
+            transform: scale(1.05) rotate(0deg);
+            box-shadow: 0 15px 35px rgba(167, 29, 49, 0.15);
+            z-index: 10;
+        }
+
+        .caption {
+            font-family: 'Caveat', cursive;
+            font-size: 1.4rem;
+            text-align: center;
+            margin-top: 15px;
+            color: #4a4a4a;
+            line-height: 1.2;
+        }
+
+        .polaroid::before, .polaroid-auto-ratio::before {
+            content: "";
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-4deg);
+            width: 85px;
+            height: 28px;
+            background-color: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(1.5px);
+            border-left: 2px dashed rgba(0,0,0,0.04);
+            border-right: 2px dashed rgba(0,0,0,0.04);
+        }
+
+        .gift-btn {
+            margin-top: 70px;
+            padding: 15px 40px;
+            background-color: #a71d31;
+            color: #faf6f0;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(167, 29, 49, 0.3);
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+        }
+
+        .gift-btn:hover {
+            background-color: #c71f37;
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(167, 29, 49, 0.5);
+        }
+
+        /* ----------------------------------------------------- */
+        /* OVERLAY HALAMAN HADIAH BUNGA (FULLSCREEN) */
+        #gift-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #faf6f0;
+            z-index: 9999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+
+        .flower-title {
+            font-family: 'Caveat', cursive;
+            font-size: 2.5rem;
+            color: #a71d31;
+            margin-bottom: 5px;
+            text-align: center;
+            padding: 0 20px;
+            line-height: 1.3;
+        }
+
+        .flower-subtitle {
+            font-size: 1.1rem;
+            color: #615154;
+            max-width: 450px;
+            text-align: center;
+            margin: 0 20px 40px 20px;
+            line-height: 1.6;
+            font-weight: 400;
+            z-index: 10;
+        }
+
+        .flower-subtitle span {
+            font-weight: 600;
+            color: #d68c00;
+        }
+
+        /* BUKET 5 TANGKAI BUNGA MATAHARI */
+        .bouquet-container {
+            position: relative;
+            width: 250px;
+            height: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .stems-group {
+            position: absolute;
+            top: 100px;
+            width: 60px;
+            height: 140px;
+            z-index: 1;
+        }
+        .stem {
+            position: absolute;
+            width: 4px;
+            height: 120px;
+            background-color: #557a46;
+            left: 50%;
+            transform-origin: bottom center;
+        }
+        .stem-1 { transform: translateX(-50%) rotate(-15deg); }
+        .stem-2 { transform: translateX(-50%) rotate(-7deg); height: 130px; }
+        .stem-3 { transform: translateX(-50%) rotate(0deg); height: 135px; }
+        .stem-4 { transform: translateX(-50%) rotate(7deg); height: 130px; }
+        .stem-5 { transform: translateX(-50%) rotate(15deg); }
+
+        .sunflowers-grid {
+            position: relative;
+            width: 180px;
+            height: 140px;
+            z-index: 3;
+        }
+
+        .sunflower {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+        }
+        .flower-core {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px; height: 24px;
+            background: radial-gradient(circle, #4a2c00 40%, #2b1a00 100%);
+            border-radius: 50%;
+            z-index: 5;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.4);
+        }
+        .petals-layer {
+            position: absolute;
+            width: 100%; height: 100%;
+            background: repeating-conic-gradient(from 0deg, #ffcc00 0deg 15deg, #ffa600 15deg 30deg);
+            border-radius: 50%;
+            clip-path: polygon(50% 0%, 60% 35%, 95% 20%, 75% 50%, 95% 80%, 60% 65%, 50% 100%, 40% 65%, 5% 80%, 25% 50%, 5% 20%, 40% 35%);
+            z-index: 4;
+        }
+        .petals-layer.rear {
+            transform: rotate(15deg) scale(1.05);
+            background: repeating-conic-gradient(from 0deg, #ffa600 0deg 15deg, #e68a00 15deg 30deg);
+            z-index: 3;
+        }
+
+        .fl-1 { top: 10px; left: 10px; }
+        .fl-2 { top: 0px; left: 60px; transform: scale(1.1); }
+        .fl-3 { top: 10px; left: 110px; }
+        .fl-4 { top: 50px; left: 35px; }
+        .fl-5 { top: 50px; left: 85px; }
+
+        .wrapping-paper {
+            position: absolute;
+            bottom: 30px;
+            width: 150px;
+            height: 150px;
+            background: #dfd3c3;
+            clip-path: polygon(0% 15%, 100% 15%, 75% 100%, 25% 100%);
+            z-index: 2;
+            box-shadow: inset 0 15px 25px rgba(0,0,0,0.06), 0 10px 20px rgba(0,0,0,0.08);
+        }
+        .wrapping-paper-front {
+            position: absolute;
+            bottom: 30px;
+            width: 150px;
+            height: 110px;
+            background: #eedede;
+            clip-path: polygon(15% 0%, 85% 0%, 75% 100%, 25% 100%);
+            opacity: 0.65;
+            z-index: 4;
+        }
+
+        .bouquet-ribbon {
+            position: absolute;
+            bottom: 50px;
+            width: 40px;
+            height: 14px;
+            background-color: #a71d31;
+            border-radius: 3px;
+            z-index: 6;
+        }
+        .bouquet-ribbon::before, .bouquet-ribbon::after {
+            content: "";
+            position: absolute;
+            width: 16px; height: 16px;
+            background-color: #a71d31;
+            border-radius: 50% 50% 0 50%;
+            top: -6px; left: -6px;
+            transform: rotate(-45deg);
+        }
+        .bouquet-ribbon::after {
+            left: auto; right: -6px;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(45deg);
+        }
+
+        .petal-fall {
+            position: absolute;
+            top: -20px;
+            pointer-events: none;
+            animation: fall linear forwards;
+            opacity: 0.85;
+            z-index: 10000;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(105vh) rotate(360deg); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .back-btn {
+            margin-top: 50px;
+            color: #801326;
+            background: none;
+            border: none;
+            border-bottom: 1px solid #801326;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="audio-gate">
+        <div class="gate-title">Sebelum kamu masuk... ✨</div>
+        <div class="gate-subtitle">
+            Aku cuma mau bilang makasih ya, udah hadir dan mewarnai hari-hariku selama ini. Karena setiap momen yang kita lewatin itu berharga banget buat aku. Siap buat liat rangkuman memori kita? ❤️
+        </div>
+        <button class="start-btn" onclick="initWeb()">Intip Memorinya Yuk 💖</button>
+    </div>
+
+    <audio id="main-audio" src="georgia.mp3" loop></audio>
+
+    <h1>KAMU GANTENG BANGET ❤️</h1>
+    <p style="text-align:center; font-weight:300; margin: 0 0 20px 0;">Scroll pelan-pelan yaaa...</p>
+
+    <div class="section-title">Foto Na Cello</div>
+    <div class="memory-container">
+        <div class="polaroid" style="--angle: -2deg;"><img src="lo.jpeg"><div class="caption">Ini pap pertama celo ke nad</div></div>
+        <div class="polaroid" style="--angle: 3deg;"><img src="cel.jpeg"><div class="caption">Kamu wisudaa</div></div>
+        <div class="polaroid" style="--angle: -3deg;"><img src="mar.jpeg"><div class="caption">Ini aku nyolong dari ch km hehe</div></div>
+        <div class="polaroid" style="--angle: 2deg;"><img src="rp.jpeg"><div class="caption">Kamu habis mandi nih</div></div>
+    </div>
+
+    <div class="section-title">Memories on RP</div>
+    <div class="memory-container">
+        <div class="polaroid" style="--angle: 3deg;"><img src="first.jpeg"><div class="caption">Ini kamu, gajelas, baru juga kenal di gc</div></div>
+        <div class="polaroid" style="--angle: -4deg;"><img src="12apr.jpeg"><div class="caption">Kita jadian, gajelas juga jadian nya</div></div>
+        <div class="polaroid" style="--angle: 3deg;"><img src="begama.jpeg"><div class="caption">Loh?! kita beda agama ya??</div></div>
+        <div class="polaroid" style="--angle: 2deg;"><img src="benefit.jpeg"><div class="caption">Ni benefitnya kurang ini bang</div></div>
+        <div class="polaroid" style="--angle: 4deg;"><img src="gws.jpeg"><div class="caption">Ini km sakit, smpe 5 hari aku feeling lonely</div></div>
+        <div class="polaroid" style="--angle: -3deg;"><img src="laka.jpeg"><div class="caption">Ni kamu habis kecelakaan, lucu bgt syaland</div></div>
+
+        <div class="custom-ratio-container">
+            <div class="polaroid-auto-ratio" style="--angle: -2deg;"><img src="rprl.jpeg"><div class="caption">Kita rprl nih wkwk</div></div>
+            <div class="polaroid-auto-ratio" style="--angle: 2deg;"><img src="lov.jpeg"><div class="caption">LOVE U MORE SAYANG 💖</div></div>
+        </div>
+    </div>
+
+    <div class="section-title">Bonus ✨</div>
+    <div class="memory-container">
+        <div class="polaroid" style="--angle: -3deg;"><img src="one.jpeg"><div class="caption">First time nad pap ke cello</div></div>
+        <div class="polaroid" style="--angle: 2deg;"><img src="nad.jpeg"><div class="caption">Ini foto nad buat collab sama cello</div></div>
+    </div>
+
+    <button class="gift-btn" onclick="openGift()">Buka Hadiah Spesial untuk Cello 🎁</button>
+
+
+    <div id="gift-overlay">
+        <div class="flower-title">Sunflower buat kamu yang cintanya selalu menghadap kepadaku... 🌻</div>
+        <div class="flower-subtitle">
+            Beruntung banget ketemu kamu yang ganteng, perhatian, dewasa, pinter... tapi sayangnya kok <span>virtual + mangu</span> hahaha 😭❤️
+        </div>
+
+        <div class="bouquet-container">
+            <div class="sunflowers-grid">
+                <div class="sunflower fl-1"><div class="petals-layer rear"></div><div class="petals-layer"></div><div class="flower-core"></div></div>
+                <div class="sunflower fl-2"><div class="petals-layer rear"></div><div class="petals-layer"></div><div class="flower-core"></div></div>
+                <div class="sunflower fl-3"><div class="petals-layer rear"></div><div class="petals-layer"></div><div class="flower-core"></div></div>
+                <div class="sunflower fl-4"><div class="petals-layer rear"></div><div class="petals-layer"></div><div class="flower-core"></div></div>
+                <div class="sunflower fl-5"><div class="petals-layer rear"></div><div class="petals-layer"></div><div class="flower-core"></div></div>
+            </div>
+            <div class="stems-group">
+                <div class="stem stem-1"></div>
+                <div class="stem stem-2"></div>
+                <div class="stem stem-3"></div>
+                <div class="stem stem-4"></div>
+                <div class="stem stem-5"></div>
+            </div>
+            <div class="wrapping-paper"></div>
+            <div class="wrapping-paper-front"></div>
+            <div class="bouquet-ribbon"></div>
+        </div>
+
+        <button class="back-btn" onclick="closeGift()">Lihat memori lagi</button>
+    </div>
+
+
+    <script>
+        const audio = document.getElementById('main-audio');
+        
+        function initWeb() {
+            document.getElementById('audio-gate').style.display = 'none';
+            audio.play().catch(err => console.log("Gagal memutar lagu"));
+        }
+
+        let petalInterval;
+
+        function openGift() {
+            const overlay = document.getElementById('gift-overlay');
+            overlay.style.display = 'flex';
+            
+            setTimeout(() => {
+                overlay.style.opacity = '1';
+                startSunPetals();
+            }, 30);
+            
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeGift() {
+            const overlay = document.getElementById('gift-overlay');
+            overlay.style.opacity = '0';
+            clearInterval(petalInterval);
+            
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 600);
+        }
+
+        function startSunPetals() {
+            petalInterval = setInterval(() => {
+                const petal = document.createElement('div');
+                petal.classList.add('petal-fall');
+                petal.style.left = Math.random() * 100 + 'vw';
+                petal.style.width = Math.random() * 14 + 8 + 'px';
+                petal.style.height = Math.random() * 8 + 6 + 'px';
+                petal.style.backgroundColor = Math.random() > 0.4 ? '#ffcc00' : '#ffa600';
+                petal.style.borderRadius = '50% 0 50% 50%';
+                petal.style.animationDuration = Math.random() * 3 + 2.5 + 's';
+                
+                document.getElementById('gift-overlay').appendChild(petal);
+                
+                setTimeout(() => { petal.remove(); }, 4000);
+            }, 200);
+        }
+    </script>
+</body>
+</html>
